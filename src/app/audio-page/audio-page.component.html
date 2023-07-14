@@ -1,1 +1,10 @@
-<p>audio-page works!</p>
+<select>
+  <option
+    *ngFor="let audioDevice of audioDevices; index as i"
+    [value]="audioDevice"
+  >
+    {{ audioDevice.label || "Webcam " + (i + 1).toString() }}
+  </option>
+</select>
+
+<audio #audio controls></audio>

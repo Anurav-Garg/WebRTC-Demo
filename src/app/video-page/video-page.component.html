@@ -1,1 +1,10 @@
-<p>video-page works!</p>
+<select>
+  <option
+    *ngFor="let videoDevice of videoDevices; index as i"
+    [value]="videoDevice"
+  >
+    {{ videoDevice.label || "Webcam " + (i + 1).toString() }}
+  </option>
+</select>
+
+<video autoplay #video></video>
