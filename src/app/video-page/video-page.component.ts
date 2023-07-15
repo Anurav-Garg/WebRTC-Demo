@@ -18,8 +18,14 @@ import {
 })
 export class VideoPageComponent implements AfterViewInit, OnChanges, OnDestroy {
   @ViewChild('video') videoRef!: ElementRef;
+  @ViewChild('recordedVideo') recordedVideoRef!: ElementRef;
   webcamVideo!: HTMLVideoElement;
+  recordedVideo!: HTMLVideoElement;
   videoTracks: MediaStream | null = null;
+
+  recordedBlobs: Blob[] = [];
+  recorder: MediaRecorder | null = null;
+  recording = false;
 
   @Input() videoDevices: MediaDeviceInfo[] = [];
   @Output() videoDevicesChange = new EventEmitter<MediaDeviceInfo[]>();
@@ -30,6 +36,7 @@ export class VideoPageComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   ngAfterViewInit(): void {
     this.webcamVideo = this.videoRef.nativeElement;
+    this.recordedVideo = this.recordedVideoRef.nativeElement;
 
     if (this.videoDevices.length > 0) {
       this.setVideoStream(this.videoDevices[0].deviceId);
@@ -80,5 +87,45 @@ export class VideoPageComponent implements AfterViewInit, OnChanges, OnDestroy {
         error.message
       );
     }
+  }
+
+  recordingStart(): void {
+    this.recordedBlobs = [];
+    if (this.videoTracks === null) {
+      // TODO: error about permissions
+      return;
+    }
+
+    console.log('Support:', MediaRecorder.isTypeSupported('video/webm'));
+
+    try {
+      this.recorder = new MediaRecorder(this.videoTracks, {
+        mimeType: 'video/webm',
+      });
+    } catch (error: any) {
+      console.log('error while starting recorder:', error.name, error.message);
+      return;
+    }
+
+    this.recorder.start();
+    this.recording = true;
+    this.recorder.ondataavailable = (event: any) => {
+      if (event.data && event.data.size > 0) {
+        this.recordedBlobs.push(event.data);
+        console.log('a blob was pushed!');
+      }
+    };
+    this.recorder.onstop = (event: any) => {
+      const videoBuffer = new Blob(this.recordedBlobs, {
+        type: 'video/webm',
+      });
+
+      this.recordedVideo.src = window.URL.createObjectURL(videoBuffer);
+    };
+  }
+
+  recordingStop(): void {
+    this.recording = false;
+    this.recorder?.stop();
   }
 }

@@ -18,8 +18,14 @@ import {
 })
 export class AudioPageComponent implements AfterViewInit, OnChanges, OnDestroy {
   @ViewChild('audio') audioRef!: ElementRef;
+  @ViewChild('recordedAudio') recordedAudioRef!: ElementRef;
   micAudio!: HTMLVideoElement;
+  recordedAudio!: HTMLVideoElement;
   audioTracks: MediaStream | null = null;
+
+  recordedBlobs: Blob[] = [];
+  recorder: MediaRecorder | null = null;
+  recording = false;
 
   @Input() audioDevices: MediaDeviceInfo[] = [];
   @Output() audioDevicesChange = new EventEmitter<MediaDeviceInfo[]>();
@@ -30,6 +36,7 @@ export class AudioPageComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   ngAfterViewInit(): void {
     this.micAudio = this.audioRef.nativeElement;
+    this.recordedAudio = this.recordedAudioRef.nativeElement;
 
     if (this.audioDevices.length > 0) {
       this.setAudioStream(this.audioDevices[0].deviceId);
@@ -80,5 +87,45 @@ export class AudioPageComponent implements AfterViewInit, OnChanges, OnDestroy {
         error.message
       );
     }
+  }
+
+  recordingStart(): void {
+    this.recordedBlobs = [];
+    if (this.audioTracks === null) {
+      // TODO: error about permissions
+      return;
+    }
+
+    console.log('Support:', MediaRecorder.isTypeSupported('audio/ogg'));
+
+    try {
+      this.recorder = new MediaRecorder(this.audioTracks, {
+        mimeType: 'audio/ogg',
+      });
+    } catch (error: any) {
+      console.log('error while starting recorder:', error.name, error.message);
+      return;
+    }
+
+    this.recorder.start();
+    this.recording = true;
+    this.recorder.ondataavailable = (event: any) => {
+      if (event.data && event.data.size > 0) {
+        this.recordedBlobs.push(event.data);
+        console.log('a blob was pushed!');
+      }
+    };
+    this.recorder.onstop = (event: any) => {
+      const audioBuffer = new Blob(this.recordedBlobs, {
+        type: 'audio/ogg',
+      });
+
+      this.recordedAudio.src = window.URL.createObjectURL(audioBuffer);
+    };
+  }
+
+  recordingStop(): void {
+    this.recording = false;
+    this.recorder?.stop();
   }
 }
