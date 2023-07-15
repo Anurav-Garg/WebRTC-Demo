@@ -45,8 +45,6 @@ export class VideoPageComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['videoDevices']) {
-      console.log('changes:', changes['videoDevices']);
-
       if (
         this.videoDevices.length > 0 &&
         changes['videoDevices'].previousValue &&
@@ -96,8 +94,6 @@ export class VideoPageComponent implements AfterViewInit, OnChanges, OnDestroy {
       return;
     }
 
-    console.log('Support:', MediaRecorder.isTypeSupported('video/webm'));
-
     try {
       this.recorder = new MediaRecorder(this.videoTracks, {
         mimeType: 'video/webm',
@@ -112,7 +108,6 @@ export class VideoPageComponent implements AfterViewInit, OnChanges, OnDestroy {
     this.recorder.ondataavailable = (event: any) => {
       if (event.data && event.data.size > 0) {
         this.recordedBlobs.push(event.data);
-        console.log('a blob was pushed!');
       }
     };
     this.recorder.onstop = (event: any) => {

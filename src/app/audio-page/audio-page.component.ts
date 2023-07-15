@@ -45,8 +45,6 @@ export class AudioPageComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['audioDevices']) {
-      console.log('changes:', changes['audioDevices']);
-
       if (
         this.audioDevices.length > 0 &&
         changes['audioDevices'].previousValue &&
@@ -96,8 +94,6 @@ export class AudioPageComponent implements AfterViewInit, OnChanges, OnDestroy {
       return;
     }
 
-    console.log('Support:', MediaRecorder.isTypeSupported('audio/ogg'));
-
     try {
       this.recorder = new MediaRecorder(this.audioTracks, {
         mimeType: 'audio/ogg',
@@ -112,7 +108,6 @@ export class AudioPageComponent implements AfterViewInit, OnChanges, OnDestroy {
     this.recorder.ondataavailable = (event: any) => {
       if (event.data && event.data.size > 0) {
         this.recordedBlobs.push(event.data);
-        console.log('a blob was pushed!');
       }
     };
     this.recorder.onstop = (event: any) => {
