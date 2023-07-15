@@ -5,6 +5,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   Output,
   SimpleChanges,
   ViewChild,
@@ -15,24 +16,27 @@ import {
   templateUrl: './audio-page.component.html',
   styleUrls: ['./audio-page.component.css'],
 })
-export class AudioPageComponent implements AfterViewInit, OnChanges {
+export class AudioPageComponent implements AfterViewInit, OnChanges, OnDestroy {
   @ViewChild('audio') audioRef!: ElementRef;
   micAudio!: HTMLVideoElement;
+  audioTracks: MediaStream | null = null;
 
   @Input() audioDevices: MediaDeviceInfo[] = [];
   @Output() audioDevicesChange = new EventEmitter<MediaDeviceInfo[]>();
 
+  selectedDevice = '';
+
   @Output() gotPermission = new EventEmitter<void>();
 
-  async ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.micAudio = this.audioRef.nativeElement;
 
     if (this.audioDevices.length > 0) {
-      this.setAudioStream();
+      this.setAudioStream(this.audioDevices[0].deviceId);
     }
   }
 
-  async ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     if (changes['audioDevices']) {
       console.log('changes:', changes['audioDevices']);
 
@@ -41,16 +45,32 @@ export class AudioPageComponent implements AfterViewInit, OnChanges {
         changes['audioDevices'].previousValue &&
         changes['audioDevices'].previousValue.length === 0
       ) {
-        this.setAudioStream();
+        this.setAudioStream(this.audioDevices[0].deviceId);
       }
     }
   }
 
-  async setAudioStream() {
-    try {
-      this.micAudio.srcObject = await navigator.mediaDevices.getUserMedia({
-        audio: { deviceId: { exact: this.audioDevices[0].deviceId } },
+  ngOnDestroy(): void {
+    if (this.audioTracks) {
+      this.audioTracks.getTracks().forEach((track) => {
+        track.stop();
       });
+    }
+  }
+
+  deviceChange(): void {
+    console.log('audio device changed:', this.selectedDevice);
+
+    this.setAudioStream(this.selectedDevice);
+  }
+
+  async setAudioStream(deviceId: string) {
+    try {
+      this.audioTracks = await navigator.mediaDevices.getUserMedia({
+        audio: { deviceId: { exact: deviceId } },
+      });
+      this.micAudio.srcObject = this.audioTracks;
+      this.selectedDevice = deviceId;
 
       this.gotPermission.emit();
     } catch (error: any) {

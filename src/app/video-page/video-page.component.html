@@ -1,7 +1,7 @@
-<select>
+<select [(ngModel)]="selectedDevice" (change)="deviceChange()">
   <option
     *ngFor="let videoDevice of videoDevices; index as i"
-    [value]="videoDevice"
+    [value]="videoDevice.deviceId"
   >
     {{ videoDevice.label || "Webcam " + (i + 1).toString() }}
   </option>
