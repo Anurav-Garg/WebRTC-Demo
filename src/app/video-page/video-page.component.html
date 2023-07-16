@@ -1,17 +1,57 @@
-<select [(ngModel)]="selectedDevice" (change)="deviceChange()">
-  <option
-    *ngFor="let videoDevice of videoDevices; index as i"
-    [value]="videoDevice.deviceId"
-  >
-    {{ videoDevice.label || "Webcam " + (i + 1).toString() }}
-  </option>
-</select>
+<div class="video-page">
+  <div class="selectors">
+    <div class="selector">
+      Device:
+      <select [(ngModel)]="selectedDevice" (change)="deviceChange()">
+        <option
+          *ngFor="let videoDevice of videoDevices; index as i"
+          [value]="videoDevice.deviceId"
+        >
+          {{ videoDevice.label || "Webcam " + (i + 1).toString() }}
+        </option>
+      </select>
+    </div>
+    <div class="selector">
+      Resolution:
+      <select [(ngModel)]="selectedResolution" (change)="changeResolution()">
+        <option [value]="'default'">Default</option>
+        <option
+          *ngFor="let videoResolution of videoResolutions"
+          [value]="videoResolution.name"
+        >
+          {{ videoResolution.name }}
+        </option>
+      </select>
+    </div>
+  </div>
 
-<video autoplay #video></video>
-<button (click)="recordingStart()" *ngIf="!recording; else stopRecordingButton">
-  Start Recording
-</button>
-<ng-template #stopRecordingButton>
-  <button (click)="recordingStop()">Stop Recording</button>
-</ng-template>
-<video autoplay #recordedVideo controls></video>
+  <div *ngIf="resolutionNotSupported" class="resolution-warning">
+    <div class="warning-heading">Error!</div>
+    <div>The selected resolution is not compatible with your webcam</div>
+  </div>
+  <div class="video-container">
+    <video
+      autoplay
+      #video
+      [ngClass]="{ disabled: resolutionNotSupported }"
+    ></video>
+    <button
+      (click)="recordingStart()"
+      *ngIf="!recording; else stopRecordingButton"
+      class="recording-button"
+    >
+      <span class="material-symbols-outlined md-48">
+        radio_button_checked
+      </span>
+    </button>
+    <ng-template #stopRecordingButton>
+      <button (click)="recordingStop()" class="recording-button">
+        <span class="material-symbols-outlined md-48"> stop_circle </span>
+      </button>
+    </ng-template>
+  </div>
+  <div class="recorded-video-container">
+    Recorded Video:
+    <video autoplay #recordedVideo controls></video>
+  </div>
+</div>

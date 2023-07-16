@@ -1,17 +1,31 @@
-<select [(ngModel)]="selectedDevice" (change)="deviceChange()">
-  <option
-    *ngFor="let audioDevice of audioDevices; index as i"
-    [value]="audioDevice.deviceId"
-  >
-    {{ audioDevice.label || "Microphone " + (i + 1).toString() }}
-  </option>
-</select>
+<div class="audio-page">
+  <div class="selector">
+    Device:
+    <select [(ngModel)]="selectedDevice" (change)="deviceChange()">
+      <option
+        *ngFor="let audioDevice of audioDevices; index as i"
+        [value]="audioDevice.deviceId"
+      >
+        {{ audioDevice.label || "Microphone " + (i + 1).toString() }}
+      </option>
+    </select>
+  </div>
 
-<audio autoplay #audio controls></audio>
-<button (click)="recordingStart()" *ngIf="!recording; else stopRecordingButton">
-  Start Recording
-</button>
-<ng-template #stopRecordingButton>
-  <button (click)="recordingStop()">Stop Recording</button>
-</ng-template>
-<audio #recordedAudio controls></audio>
+  <audio autoplay #audio controls></audio>
+  <button
+    (click)="recordingStart()"
+    *ngIf="!recording; else stopRecordingButton"
+    class="recording-button"
+  >
+    <span class="material-symbols-outlined md-48"> radio_button_checked </span>
+  </button>
+  <ng-template #stopRecordingButton>
+    <button (click)="recordingStop()" class="recording-button">
+      <span class="material-symbols-outlined md-48"> stop_circle </span>
+    </button>
+  </ng-template>
+  <div class="recorded-audio-container">
+    Recorded Audio:
+    <audio #recordedAudio controls></audio>
+  </div>
+</div>

@@ -1,0 +1,51 @@
+.audio-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+select {
+  border-style: solid;
+  border-radius: 0.25rem; /* 4px */
+  
+  background: none;
+
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.selector {
+  display: flex;
+  flex-direction: column;
+}
+
+.recording-button {
+  color: rgb(220 38 38);
+  font-weight: 600;
+
+  cursor: pointer;
+
+  border-style: none;
+  background: none;
+  
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+.recording-button:hover {
+  color: rgb(239 68 68);
+}
+
+.recorded-audio-container {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
