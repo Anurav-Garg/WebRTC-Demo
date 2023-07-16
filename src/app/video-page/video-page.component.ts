@@ -69,32 +69,18 @@ export class VideoPageComponent implements AfterViewInit, OnChanges, OnDestroy {
     this.setVideoStream(this.selectedDevice);
   }
 
-  async setVideoStream(deviceId: string) {
-    if (deviceId === '') {
-      try {
-        console.log('here');
-
+  async setVideoStream(deviceId: string, resolution: string = 'default') {
+    try {
+      if (deviceId === '') {
         this.videoTracks = await navigator.mediaDevices.getUserMedia({
           video: true,
         });
-        this.webcamVideo.srcObject = this.videoTracks;
-        this.selectedDevice = deviceId;
-
-        this.gotPermission.emit();
-      } catch (error: any) {
-        console.log(
-          'error while setting audio stream:',
-          error.name,
-          error.message
-        );
+      } else {
+        this.videoTracks = await navigator.mediaDevices.getUserMedia({
+          video: { deviceId: { exact: deviceId } },
+        });
       }
-      return;
-    }
 
-    try {
-      this.videoTracks = await navigator.mediaDevices.getUserMedia({
-        video: { deviceId: { exact: deviceId } },
-      });
       this.webcamVideo.srcObject = this.videoTracks;
       this.selectedDevice = deviceId;
 

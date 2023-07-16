@@ -70,10 +70,8 @@ export class AudioPageComponent implements AfterViewInit, OnChanges, OnDestroy {
   }
 
   async setAudioStream(deviceId: string) {
-    if (deviceId === '') {
-      try {
-        console.log('here');
-
+    try {
+      if (deviceId === '') {
         this.audioTracks = await navigator.mediaDevices.getUserMedia({
           audio: {
             echoCancellation: false,
@@ -81,29 +79,16 @@ export class AudioPageComponent implements AfterViewInit, OnChanges, OnDestroy {
             noiseSuppression: false,
           },
         });
-        this.micAudio.srcObject = this.audioTracks;
-        this.selectedDevice = deviceId;
-
-        this.gotPermission.emit();
-      } catch (error: any) {
-        console.log(
-          'error while setting audio stream:',
-          error.name,
-          error.message
-        );
+      } else {
+        this.audioTracks = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            deviceId: { exact: deviceId },
+            echoCancellation: false,
+            autoGainControl: false,
+            noiseSuppression: false,
+          },
+        });
       }
-      return;
-    }
-
-    try {
-      this.audioTracks = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          deviceId: { exact: deviceId },
-          echoCancellation: false,
-          autoGainControl: false,
-          noiseSuppression: false,
-        },
-      });
       this.micAudio.srcObject = this.audioTracks;
       this.selectedDevice = deviceId;
 
