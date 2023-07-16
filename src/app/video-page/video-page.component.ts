@@ -10,6 +10,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
+import { videoResolution } from '../videoResolutions';
 
 @Component({
   selector: 'app-video-page',
@@ -30,7 +31,11 @@ export class VideoPageComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() videoDevices: MediaDeviceInfo[] = [];
   @Output() videoDevicesChange = new EventEmitter<MediaDeviceInfo[]>();
 
+  @Input() videoResolutions: videoResolution[] = [];
+
   selectedDevice = '';
+  selectedResolution = 'default';
+  resolutionNotSupported = false;
 
   @Output() gotPermission = new EventEmitter<void>();
 
@@ -76,16 +81,47 @@ export class VideoPageComponent implements AfterViewInit, OnChanges, OnDestroy {
           video: true,
         });
       } else {
-        this.videoTracks = await navigator.mediaDevices.getUserMedia({
-          video: { deviceId: { exact: deviceId } },
-        });
+        if (resolution === 'default') {
+          this.videoTracks = await navigator.mediaDevices.getUserMedia({
+            video: { deviceId: { exact: deviceId } },
+          });
+        } else {
+          for (let videoResolution of this.videoResolutions) {
+            if (videoResolution.name === resolution) {
+              this.videoTracks = await navigator.mediaDevices.getUserMedia({
+                video: {
+                  deviceId: { exact: deviceId },
+                  height: videoResolution.height,
+                  width: videoResolution.width,
+                },
+              });
+
+              break;
+            }
+          }
+        }
       }
 
+      console.log('set resolution successfully');
+      this.resolutionNotSupported = false;
       this.webcamVideo.srcObject = this.videoTracks;
       this.selectedDevice = deviceId;
+      this.recordingStop();
 
       this.gotPermission.emit();
     } catch (error: any) {
+      if (error.name === 'OverconstrainedError') {
+        this.resolutionNotSupported = true;
+
+        if (this.videoTracks) {
+          this.videoTracks.getTracks().forEach((track) => {
+            track.stop();
+          });
+          this.webcamVideo.srcObject = null;
+          this.videoTracks = null;
+        }
+      }
+
       console.log(
         'error while setting video stream:',
         error.name,
@@ -129,5 +165,11 @@ export class VideoPageComponent implements AfterViewInit, OnChanges, OnDestroy {
   recordingStop(): void {
     this.recording = false;
     this.recorder?.stop();
+  }
+
+  changeResolution(): void {
+    console.log('video resolution changed:', this.selectedResolution);
+
+    this.setVideoStream(this.selectedDevice, this.selectedResolution);
   }
 }
