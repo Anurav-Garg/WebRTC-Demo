@@ -1,16 +1,34 @@
 <div class="navbar">
-  <button [disabled]="onVideoPage" (click)="togglePage()">Video</button>
-  <button [disabled]="!onVideoPage" (click)="togglePage()">Audio</button>
+  <button
+    [disabled]="onVideoPage"
+    (click)="togglePage()"
+    [ngClass]="{ active: !onVideoPage }"
+  >
+    Video
+  </button>
+  <button
+    [disabled]="!onVideoPage"
+    (click)="togglePage()"
+    [ngClass]="{ active: onVideoPage }"
+  >
+    Audio
+  </button>
 </div>
 
-<app-video-page
-  *ngIf="onVideoPage; else audioPage"
-  [(videoDevices)]="videoDevices"
-  (gotPermission)="updateDevices()"
-/>
-<ng-template #audioPage>
-  <app-audio-page
-    [(audioDevices)]="audioDevices"
+<div class="page-container">
+  <div class="heading">WebRTC Demo</div>
+  <app-video-page
+    *ngIf="onVideoPage; else audioPage"
+    [(videoDevices)]="videoDevices"
+    [videoResolutions]="allowedVideoResolutions"
     (gotPermission)="updateDevices()"
+    class="content-page-container"
   />
-</ng-template>
+  <ng-template #audioPage>
+    <app-audio-page
+      [(audioDevices)]="audioDevices"
+      (gotPermission)="updateDevices()"
+      class="content-page-container"
+    />
+  </ng-template>
+</div>

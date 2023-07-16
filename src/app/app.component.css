@@ -1,0 +1,69 @@
+.navbar {
+  top:0px;
+  position: sticky;
+  z-index: 10;
+
+  background-color: white;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
+
+  border-top-width: 0px;
+  border-bottom-width: 0.125rem;
+  border-right-width: 0px;
+  border-left-width: 0px;
+  
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+button {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  color: rgb(71 85 105);
+  font-weight: 600;
+
+  border-style: none;
+  background: none;
+  
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+
+  text-decoration-line: underline;
+  text-underline-offset: 12px;
+  text-decoration-thickness: 4px;
+}
+
+button.active {
+  cursor: pointer;
+
+  color: rgb(100 116 139);
+  text-decoration: none;
+}
+
+button.active:hover {
+  color: rgb(0 0 0);
+}
+
+.page-container {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.heading {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  color: rgb(51 65 85);
+  font-weight: 700;
+}
+
+.content-page-container {
+  width: 80%;
+}

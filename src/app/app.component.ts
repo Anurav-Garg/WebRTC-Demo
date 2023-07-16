@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { videoResolution, videoResolutions } from './videoResolutions';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +14,7 @@ export class AppComponent implements OnInit {
   audioNotAllowed = false;
   videoDevices: MediaDeviceInfo[] = [];
   audioDevices: MediaDeviceInfo[] = [];
+  allowedVideoResolutions: videoResolution[] = videoResolutions;
 
   async ngOnInit() {
     this.updateDevices();
