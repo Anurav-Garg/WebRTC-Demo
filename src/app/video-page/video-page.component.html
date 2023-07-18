@@ -25,20 +25,25 @@
     </div>
   </div>
 
-  <div *ngIf="resolutionNotSupported" class="resolution-warning">
+  <div *ngIf="resolutionNotSupported" class="warning">
     <div class="warning-heading">Error!</div>
     <div>The selected resolution is not compatible with your webcam</div>
+  </div>
+  <div *ngIf="notAllowed" class="warning">
+    <div class="warning-heading">Error!</div>
+    <div>Permission to use the selected device was not granted</div>
   </div>
   <div class="video-container">
     <video
       autoplay
       #video
-      [ngClass]="{ disabled: resolutionNotSupported }"
+      [ngClass]="{ disabled: resolutionNotSupported || notAllowed }"
     ></video>
     <button
       (click)="recordingStart()"
       *ngIf="!recording; else stopRecordingButton"
       class="recording-button"
+      [ngClass]="{ disabled: resolutionNotSupported || notAllowed }"
     >
       <span class="material-symbols-outlined md-48">
         radio_button_checked

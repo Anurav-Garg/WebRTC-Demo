@@ -11,11 +11,16 @@
     </select>
   </div>
 
-  <audio autoplay #audio controls></audio>
+  <div *ngIf="notAllowed" class="warning">
+    <div class="warning-heading">Error!</div>
+    <div>Permission to use the selected device was not granted</div>
+  </div>
+  <audio autoplay #audio controls [ngClass]="{ disabled: notAllowed }"></audio>
   <button
     (click)="recordingStart()"
     *ngIf="!recording; else stopRecordingButton"
     class="recording-button"
+    [ngClass]="{ disabled: notAllowed }"
   >
     <span class="material-symbols-outlined md-48"> radio_button_checked </span>
   </button>

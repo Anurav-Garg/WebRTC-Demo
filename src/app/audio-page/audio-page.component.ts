@@ -32,6 +32,8 @@ export class AudioPageComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   selectedDevice = '';
 
+  notAllowed = false;
+
   @Output() gotPermission = new EventEmitter<void>();
 
   ngAfterViewInit(): void {
@@ -89,11 +91,26 @@ export class AudioPageComponent implements AfterViewInit, OnChanges, OnDestroy {
           },
         });
       }
+      this.notAllowed = false;
       this.micAudio.srcObject = this.audioTracks;
       this.selectedDevice = deviceId;
 
       this.gotPermission.emit();
     } catch (error: any) {
+      if (error.name === 'NotAllowedError') {
+        this.notAllowed = true;
+
+        if (this.audioTracks) {
+          this.audioTracks.getTracks().forEach((track) => {
+            track.stop();
+          });
+          this.micAudio.srcObject = null;
+          this.audioTracks = null;
+
+          return;
+        }
+      }
+
       console.log(
         'error while setting audio stream:',
         error.name,

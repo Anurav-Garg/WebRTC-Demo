@@ -37,6 +37,8 @@ export class VideoPageComponent implements AfterViewInit, OnChanges, OnDestroy {
   selectedResolution = 'default';
   resolutionNotSupported = false;
 
+  notAllowed = false;
+
   @Output() gotPermission = new EventEmitter<void>();
 
   ngAfterViewInit(): void {
@@ -104,6 +106,7 @@ export class VideoPageComponent implements AfterViewInit, OnChanges, OnDestroy {
 
       console.log('set resolution successfully');
       this.resolutionNotSupported = false;
+      this.notAllowed = false;
       this.webcamVideo.srcObject = this.videoTracks;
       this.selectedDevice = deviceId;
       this.recordingStop();
@@ -112,6 +115,7 @@ export class VideoPageComponent implements AfterViewInit, OnChanges, OnDestroy {
     } catch (error: any) {
       if (error.name === 'OverconstrainedError') {
         this.resolutionNotSupported = true;
+        this.notAllowed = false;
 
         if (this.videoTracks) {
           this.videoTracks.getTracks().forEach((track) => {
@@ -120,8 +124,22 @@ export class VideoPageComponent implements AfterViewInit, OnChanges, OnDestroy {
           this.webcamVideo.srcObject = null;
           this.videoTracks = null;
         }
-      }
 
+        return;
+      } else if (error.name === 'NotAllowedError') {
+        this.notAllowed = true;
+        this.resolutionNotSupported = false;
+
+        if (this.videoTracks) {
+          this.videoTracks.getTracks().forEach((track) => {
+            track.stop();
+          });
+          this.webcamVideo.srcObject = null;
+          this.videoTracks = null;
+
+          return;
+        }
+      }
       console.log(
         'error while setting video stream:',
         error.name,
